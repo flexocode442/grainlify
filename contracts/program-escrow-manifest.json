@@ -2,9 +2,9 @@
   "contract_name": "ProgramEscrowContract",
   "version": {
     "current": "1.1.0",
-    "schema": 1
+    "schema": "1.0.0"
   },
-  "purpose": "Handles hackathon and program prize pools with batch payouts, dependency management, and circuit breaker protection.",
+  "contract_purpose": "Handles hackathon and program prize pools with batch payouts, dependency management, and circuit breaker protection.",
   "entrypoints": {
     "public": [
       {
@@ -256,9 +256,57 @@
           { "code": 705, "message": "Insurance reserve balance insufficient for withdrawal" }
         ]
       }
+    ],
+    "view": []
+  },
+  "configuration": {
+    "parameters": [],
+    "storage_keys": [
+      {
+        "name": "CircuitBreakerSchemaVersion",
+        "type": "instance",
+        "description": "Upgrade-safe schema version marker for circuit breaker storage. Written on init.",
+        "data_structure": "u32"
+      },
+      {
+        "name": "ReentrancyGuard",
+        "type": "instance",
+        "description": "u32 flag: 1=NOT_ENTERED, 2=ENTERED.",
+        "data_structure": "u32"
+      },
+      {
+        "name": "PauseFlags",
+        "type": "instance",
+        "description": "PauseFlags struct with lock_paused, release_paused, refund_paused.",
+        "data_structure": "PauseFlags"
+      },
+      {
+        "name": "Admin",
+        "type": "instance",
+        "description": "Contract admin address.",
+        "data_structure": "Address"
+      },
+      {
+        "name": "ProgramData",
+        "type": "instance",
+        "description": "Legacy single-program storage key.",
+        "data_structure": "ProgramData"
+      }
     ]
   },
   "behaviors": {
+    "security_features": [
+      "circuit breaker",
+      "reentrancy protection",
+      "idempotency keys",
+      "role separation"
+    ],
+    "access_control": [
+      {
+        "mechanism": "admin_auth",
+        "description": "Administrative operations require the configured contract or circuit administrator, while payout operations require the authorized payout key."
+      }
+    ],
     "role_separation": {
       "description": "Deterministic role separation and controller rotation with two-step process, explicit errors, and upgrade-safe storage.",
       "features": {
@@ -346,13 +394,6 @@
     "atomicity": "batch_payout uses all-or-nothing semantics. If any validation fails, no transfers occur and balance is unchanged.",
     "idempotency": "Optional idempotency key on single_payout and batch_payout ensures deterministic behavior on retries.",
     "reentrancy_protection": "All payout paths acquire a reentrancy guard before any state read."
-  },
-  "storage_keys": {
-    "CircuitBreakerSchemaVersion": "Upgrade-safe schema version marker for circuit breaker storage. Written on init.",
-    "ReentrancyGuard": "u32 flag: 1=NOT_ENTERED, 2=ENTERED.",
-    "PauseFlags": "PauseFlags struct with lock_paused, release_paused, refund_paused.",
-    "Admin": "Contract admin address.",
-    "ProgramData": "Legacy single-program storage key."
   },
   "security_notes": [
     "Circuit breaker check runs before balance and threshold checks for deterministic, stable rejection messages.",
