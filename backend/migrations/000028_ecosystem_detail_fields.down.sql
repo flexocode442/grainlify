@@ -1,4 +1,0 @@
-ALTER TABLE ecosystems DROP COLUMN IF EXISTS about;
-ALTER TABLE ecosystems DROP COLUMN IF EXISTS links;
-ALTER TABLE ecosystems DROP COLUMN IF EXISTS key_areas;
-ALTER TABLE ecosystems DROP COLUMN IF EXISTS technologies;
