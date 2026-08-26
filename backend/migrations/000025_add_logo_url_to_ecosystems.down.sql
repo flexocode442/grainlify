@@ -1,1 +1,0 @@
-ALTER TABLE ecosystems DROP COLUMN IF EXISTS logo_url;
