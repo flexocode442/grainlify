@@ -1,2 +1,0 @@
--- No-op: we don't revert the backfill (would require storing previous state).
--- If you need to undo, run: UPDATE projects SET needs_metadata = false WHERE ... (manual).
