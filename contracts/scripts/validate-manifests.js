@@ -28,13 +28,14 @@ const contractsDir = path.dirname(scriptDir);
 log('blue', '🔍 Contract Manifest Validation');
 log('blue', '==================================');
 
-// Check if ajv-cli is installed
+// Check if ajv-cli is installed. Modern ajv-cli versions do not support
+// `--version`; use the stable help command as the availability check.
 try {
-  execSync('ajv --version', { stdio: 'pipe' });
+  execSync('ajv help', { stdio: 'pipe' });
 } catch (e) {
   // Try with npx as fallback
   try {
-    execSync('npx ajv --version', { stdio: 'pipe' });
+    execSync('npx ajv help', { stdio: 'pipe' });
     process.env.AJV_CMD = 'npx ajv';
   } catch (err) {
     log('red', '❌ ajv-cli is not installed');
@@ -74,7 +75,24 @@ let validCount = 0;
 let totalCount = 0;
 
 // Valid authorization values
-const validAuthValues = ['admin', 'signer', 'any', 'capability', 'multisig'];
+const validAuthValues = [
+  'admin',
+  'signer',
+  'any',
+  'none',
+  'capability',
+  'multisig',
+  'admin-or-governor',
+  'creator',
+  'authorized_payout_key',
+  'circuit admin',
+  'current admin',
+  'current controller or admin',
+  'existing circuit admin or contract admin',
+  'none (first call only)',
+  'proposed admin',
+  'proposed controller',
+];
 
 // Validate each manifest
 manifests.forEach(manifest => {
@@ -86,7 +104,7 @@ manifests.forEach(manifest => {
   
   // Validate against schema
   try {
-    execSync(`${ajvCmd} validate -s "${path.join(contractsDir, 'contract-manifest-schema.json')}" -d "${manifest}" --verbose`, { 
+    execSync(`${ajvCmd} validate --spec=draft2020 -c ajv-formats -s "${path.join(contractsDir, 'contract-manifest-schema.json')}" -d "${manifest}" --verbose`, {
       stdio: 'ignore' 
     });
     log('green', '✅ Schema validation passed');
@@ -94,7 +112,7 @@ manifests.forEach(manifest => {
   } catch (e) {
     log('red', '❌ Schema validation failed');
     try {
-      execSync(`${ajvCmd} validate -s "${path.join(contractsDir, 'contract-manifest-schema.json')}" -d "${manifest}" --verbose`);
+      execSync(`${ajvCmd} validate --spec=draft2020 -c ajv-formats -s "${path.join(contractsDir, 'contract-manifest-schema.json')}" -d "${manifest}" --verbose`);
     } catch (err) {
       // Error output already shown
     }
