@@ -407,7 +407,7 @@
   "$defs": {
     "entrypoint": {
       "type": "object",
-      "required": ["name", "description", "parameters", "returns"],
+        "required": ["name", "description", "parameters"],
       "properties": {
         "name": {
           "type": "string",
@@ -443,7 +443,24 @@
         "authorization": {
           "type": "string",
           "description": "Authorization requirements",
-          "enum": ["admin", "signer", "any", "none", "capability", "multisig", "admin-or-governor"]
+          "enum": [
+            "admin",
+            "signer",
+            "any",
+            "none",
+            "capability",
+            "multisig",
+            "admin-or-governor",
+            "creator",
+            "authorized_payout_key",
+            "circuit admin",
+            "current admin",
+            "current controller or admin",
+            "existing circuit admin or contract admin",
+            "none (first call only)",
+            "proposed admin",
+            "proposed controller"
+          ]
         },
         "pausable": {
           "type": "boolean",
@@ -463,7 +480,7 @@
     },
     "parameter": {
       "type": "object",
-      "required": ["name", "type", "description"],
+      "required": ["name", "type"],
       "properties": {
         "name": {
           "type": "string"
